@@ -1,0 +1,22 @@
+Instalación de flask
+    pip install flask
+
+Instalación de yt-dlp
+    - pip install yt-dlp
+    Instalación en un entorno virtual
+        - pip install yt-dlp
+
+Instalación de ffmpeg (Necesario para yt-dlp)
+    sudo apt install ffmpeg
+
+Instalación para entornos virtuales
+    sudo apt install python3-venv
+
+Creación de entorno virtual
+    python3 -m venv myenv
+
+Activación de entorno virtual
+    source myenv/bin/activate
+
+Salir del entorno virtual
+    deactivate
