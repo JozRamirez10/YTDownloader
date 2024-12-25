@@ -1,10 +1,12 @@
 from flask import Flask, request, send_file, send_from_directory, jsonify
+from flask_socketio import SocketIO, emit
 import os
 from yt_dlp import YoutubeDL
 import uuid
 import re
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/')
 def index():
@@ -49,6 +51,7 @@ def download():
             'format': 'best' if format_type == "video" else 'bestaudio/best',
             'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}] if format_type == "audio" else [],
             'quiet': True,  # Silenciar la salida de yt_dlp
+            'progress_hooks': [lambda d: progress_hook(d, temp_id)],
         }
 
         with YoutubeDL(ydl_opts) as ydl:
@@ -66,5 +69,19 @@ def download():
             if temp_file.startswith(temp_id):
                 os.remove(temp_file)
 
+def progress_hook(d, temp_id):
+    if d['status'] == 'downloading':
+        percent_str = re.sub(r'\x1b\[[0-9;]*m', '', d.get('_percent_str', '0.0').strip())
+        try:
+            percent = float(percent_str.replace('%', '').strip())
+        except ValueError:
+            percent = 0.0
+        socketio.emit('progress', {'id': temp_id, 'progress': percent})
+    elif d['status'] == 'finished':
+        socketio.emit('progress', {'id': temp_id, 'progress': 100.0})
+
+def emit_error(temp_id, error_message):
+    socketio.emit('error', {'id': temp_id, 'message': error_message})
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

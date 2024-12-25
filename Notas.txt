@@ -6,6 +6,9 @@ Instalación de yt-dlp
     Instalación en un entorno virtual
         - pip install yt-dlp
 
+Instalación de Flask-SocketIO:
+    pip install flask-socketio
+
 Instalación de ffmpeg (Necesario para yt-dlp)
     sudo apt install ffmpeg
 
