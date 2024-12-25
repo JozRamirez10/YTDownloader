@@ -16,10 +16,7 @@ def index():
 def video_info():
     data = request.get_json()
     url = data.get('url')
-    
-    match = re.match(r'(https://www\.youtube\.com/watch\?v=[\w-]+)', url)
-    if match:
-        url = match.group(1)
+    url = limpiar_url(url)
     
     if not url:
         return jsonify({"error": "Faltan parámetros"}), 400
@@ -39,6 +36,7 @@ def video_info():
 def download():
     data = request.get_json()
     url = data.get('url')
+    url = limpiar_url(url)
     format_type = data.get('format')  # "video" o "audio"
 
     if not url or not format_type:
@@ -82,6 +80,13 @@ def progress_hook(d, temp_id):
 
 def emit_error(temp_id, error_message):
     socketio.emit('error', {'id': temp_id, 'message': error_message})
+
+def limpiar_url(url):
+    posicion_list = url.find("&list")
+    # Si se encuentra '&list', corta la URL hasta antes de ese punto
+    if posicion_list != -1:
+        url = url[:posicion_list]
+    return url
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
