@@ -2,6 +2,7 @@ from flask import Flask, request, send_file, send_from_directory, jsonify
 import os
 from yt_dlp import YoutubeDL
 import uuid
+import re
 
 app = Flask(__name__)
 
@@ -13,7 +14,11 @@ def index():
 def video_info():
     data = request.get_json()
     url = data.get('url')
-
+    
+    match = re.match(r'(https://www\.youtube\.com/watch\?v=[\w-]+)', url)
+    if match:
+        url = match.group(1)
+    
     if not url:
         return jsonify({"error": "Faltan parámetros"}), 400
 
@@ -62,4 +67,4 @@ def download():
                 os.remove(temp_file)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)

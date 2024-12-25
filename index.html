@@ -50,6 +50,10 @@
         const progressBar = document.getElementById('progressBar');
 
         fetchInfoBtn.addEventListener('click', async () => {
+            
+            downloadBtn.classList.add("d-none");
+            videoInfo.classList.add("d-none");
+
             const url = youtubeUrl.value.trim();
             if (!url) {
                 statusMessage.textContent = 'Por favor, ingrese una URL válida.';
